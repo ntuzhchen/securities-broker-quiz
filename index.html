@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>證券商業務員 題庫測驗系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 頂部標題與使用者列 -->
+    <header class="app-header">
+      <div class="header-main">
+        <div class="logo-area">
+          <span class="logo-badge">📈 金融證照</span>
+          <h1 class="app-title">證券商業務員 題庫測驗系統</h1>
+          <p class="app-subtitle">114年重點整理＋試題演練・全書 1,352 題收錄</p>
+        </div>
+        <div class="user-panel">
+          <button id="user-btn" class="user-chip" title="切換帳號或重置進度">
+            <span class="user-avatar">👤</span>
+            <span id="active-user-name" class="user-name">circle</span>
+            <span class="user-switch-hint">切換</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 成績與進度統計橫幅 -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-label">已作答 / 總題數</span>
+          <span class="stat-value" id="stat-answered">0 / 0</span>
+          <div class="progress-track">
+            <div class="progress-fill" id="stat-progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">總體正確率</span>
+          <span class="stat-value highlight" id="stat-accuracy">0%</span>
+          <span class="stat-sub" id="stat-correct-count">答對 0 題</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">待複習錯題</span>
+          <span class="stat-value warning" id="stat-wrong-count">0</span>
+          <span class="stat-sub">可切換錯題本</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">目前連續答對</span>
+          <span class="stat-value streak" id="stat-streak">0 🔥</span>
+          <span class="stat-sub" id="stat-best-streak">最佳 0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 導航與分類過濾控制區 -->
+    <nav class="nav-control-section">
+      <!-- 大篇章 Tab 列 -->
+      <div class="category-tabs" id="category-tabs">
+        <button class="tab-btn active" data-category="ALL">
+          全部 <span class="badge" id="count-all">1352</span>
+        </button>
+        <button class="tab-btn" data-category="法規篇">
+          法規篇 <span class="badge" id="count-law">187</span>
+        </button>
+        <button class="tab-btn" data-category="實務篇">
+          實務篇 <span class="badge" id="count-practice">188</span>
+        </button>
+        <button class="tab-btn" data-category="投資篇">
+          投資篇 <span class="badge" id="count-invest">216</span>
+        </button>
+        <button class="tab-btn" data-category="財析篇">
+          財析篇 <span class="badge" id="count-finance">200</span>
+        </button>
+        <button class="tab-btn" data-category="歷屆試題">
+          歷屆試題 <span class="badge" id="count-exam">561</span>
+        </button>
+      </div>
+
+      <!-- 細項章節下拉與模式切換工具列 -->
+      <div class="filter-toolbar">
+        <div class="select-group">
+          <label for="chapter-select" class="sr-only">選擇章節或試卷</label>
+          <select id="chapter-select" class="dropdown-select">
+            <option value="ALL">全部章節 / 歷屆試題</option>
+          </select>
+        </div>
+
+        <div class="mode-toggles">
+          <div class="segmented-control" id="mode-selector">
+            <button class="segment-btn active" data-mode="all">全部題庫</button>
+            <button class="segment-btn" data-mode="wrong">
+              錯題複習 <span class="badge-dot" id="wrong-badge-count">0</span>
+            </button>
+          </div>
+
+          <div class="segmented-control" id="order-selector">
+            <button class="segment-btn active" data-order="random">隨機抽題</button>
+            <button class="segment-btn" data-order="seq">循序刷題</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 題目主作答區 -->
+    <main class="quiz-container">
+      <!-- 正常題目卡片 -->
+      <article class="quiz-card" id="quiz-card">
+        <div class="quiz-header">
+          <div class="quiz-meta-tags">
+            <span class="meta-tag tag-level" id="q-meta-level">法規篇</span>
+            <span class="meta-tag tag-chapter" id="q-meta-chapter">Chapter 01 公司法</span>
+            <span class="meta-tag tag-source" id="q-meta-source">章節精選</span>
+          </div>
+          <div class="quiz-index-status">
+            <button id="bookmark-btn" class="bookmark-btn" title="標記收藏/加入錯題本">
+              <span id="bookmark-icon">⭐</span>
+            </button>
+            <span class="index-badge" id="q-index-info">第 1 / 187 題</span>
+          </div>
+        </div>
+
+        <!-- 題目內文 -->
+        <div class="question-body">
+          <h2 class="question-text" id="q-text">載入題目中...</h2>
+        </div>
+
+        <!-- 選項列表 -->
+        <div class="options-container" id="options-list">
+          <!-- 由 JS 動態生成 4 個選項按鈕 -->
+        </div>
+
+        <!-- 作答反饋與官方詳解區塊 -->
+        <div class="explanation-card" id="explanation-box" style="display: none;">
+          <div class="result-banner" id="result-banner">
+            <span class="result-icon" id="result-icon">✓</span>
+            <span class="result-text" id="result-text">回答正確！</span>
+          </div>
+          <div class="ans-detail">
+            <div class="correct-answer-line">
+              <span class="field-label">標準答案：</span>
+              <span class="field-val" id="exp-correct-ans">(B)</span>
+            </div>
+            <div class="explanation-content">
+              <span class="field-label">千華名師詳解與法規解析：</span>
+              <p class="field-text" id="exp-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部切換與控制列 -->
+        <div class="quiz-actions-bar">
+          <button id="btn-prev" class="action-btn secondary" title="上一題 (鍵盤 Left)">
+            <span class="arrow">←</span> 上一題
+          </button>
+          <div class="action-middle">
+            <button id="btn-toggle-exp" class="action-btn text-only" style="display: none;">
+              查看完整解析
+            </button>
+            <button id="btn-random-jump" class="action-btn ghost" title="隨機跳題">
+              🔀 隨機跳題
+            </button>
+          </div>
+          <button id="btn-next" class="action-btn primary" title="下一題 (鍵盤 Enter / Space)">
+            下一題 <span class="arrow">→</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- 錯題清空/無題目時的空狀態展示 -->
+      <div class="empty-state-card" id="empty-state" style="display: none;">
+        <div class="empty-icon">🎉</div>
+        <h3 class="empty-title" id="empty-title">太棒了！目前沒有待複習的錯題</h3>
+        <p class="empty-desc" id="empty-desc">您已完成目前選取分類的複習，或此分類下尚未有答錯紀錄。</p>
+        <button id="empty-back-btn" class="action-btn primary">回到全部題目練習</button>
+      </div>
+    </main>
+
+    <!-- 底部快捷鍵輔助提示 -->
+    <footer class="app-footer">
+      <div class="shortcuts-tip">
+        <span>💡 鍵盤捷徑：</span>
+        <kbd>1</kbd> ~ <kbd>4</kbd> 或 <kbd>A</kbd> ~ <kbd>D</kbd> 作答 ·
+        <kbd>Space</kbd> / <kbd>Enter</kbd> 下一題 ·
+        <kbd>←</kbd> 上一題
+      </div>
+      <div class="footer-copy">
+        證券商業務員題庫測驗系統 · 本題庫依據 114 年證券商業務員考試範圍建立
+      </div>
+    </footer>
+  </div>
+
+  <!-- 使用者切換 / 歷史管理 Modal -->
+  <div class="modal-overlay" id="user-modal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>使用者設定與答題歷史</h3>
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="username-input">切換目前使用者代號：</label>
+          <div class="input-inline">
+            <input type="text" id="username-input" placeholder="例如: circle, student1" maxlength="20">
+            <button id="btn-save-user" class="btn-sm primary">切換</button>
+          </div>
+          <p class="field-hint">系統會針對每個使用者代號獨立儲存答題進度、正確率與錯題本。</p>
+        </div>
+
+        <hr class="modal-divider">
+
+        <div class="user-stats-summary">
+          <h4>當前帳號作答總結 (<span id="modal-user-display">circle</span>)</h4>
+          <ul class="stats-summary-list">
+            <li>累積作答次數：<strong id="modal-stat-total">0</strong> 題</li>
+            <li>累計答對：<strong id="modal-stat-correct" class="text-success">0</strong> 題</li>
+            <li>累計答錯：<strong id="modal-stat-wrong" class="text-danger">0</strong> 題</li>
+            <li>歷史最高連勝：<strong id="modal-stat-streak">0</strong> 題</li>
+            <li>待複習錯題存量：<strong id="modal-stat-wrong-bank">0</strong> 題</li>
+          </ul>
+        </div>
+
+        <hr class="modal-divider">
+
+        <div class="danger-zone">
+          <h4>進度重置</h4>
+          <p class="field-hint">重置將清空目前使用者的所有作答歷史、正確率與錯題本資料。</p>
+          <button id="btn-reset-progress" class="btn-sm danger">清空目前使用者進度</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
